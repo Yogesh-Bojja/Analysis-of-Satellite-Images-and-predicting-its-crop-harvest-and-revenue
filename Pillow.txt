@@ -1,0 +1,333 @@
+#basic functions 
+img.split() - splits in different bands
+img.tell() - tells the frame number
+img.thumbnail() - creates thumbnail of the image
+img.transpose() - to flip/rotate the images
+img.rotate() - to rotate the image
+
+#Atrributes
+img.format
+img.filename
+img.width
+img.length
+img.size
+img.mode
+img.palette
+img.info
+
+#Iterate through directory
+for f in os.listdir('.'):
+    if "2018-09-13" in f or "2018-09-03" in f:
+        i = Image.open(f)
+        fn, fext = os.path.splitext(f)
+        i.save('new/{}.png'.format(fn))
+
+#creating mask (Basic code)
+source = im.split()
+R, G, B = 0, 1, 2
+# select regions where red is less than 100
+mask = source[R].point(lambda i: i < 100 and 255) //point function is handy if we want to pass each pixel to a lambda function; orelse getpixel(), load() functions are also used to manipulate pixel values.
+# process the green band
+out = source[G].point(lambda i: i * 0.7)
+# paste the processed band back, but only where red was < 100
+source[G].paste(out, None, mask)
+# build a new multiband image
+im = Image.merge(im.mode, source)
+
+# overlapping code
+im1 = Image.open('tiger.jpg').convert('RGBA')
+im2 = Image.open('panda.jpg').convert('RGBA')
+im2 = im2.resize((353, 368))
+r,g,b,a = im2.split()
+a = a.point(lambda i: i * 0.7)
+im2 = Image.merge(im2.mode, (r,g,b,a))
+im = Image.alpha_composite(im1, im2)
+im.show();
+im.convert('RGB').save("hello.jpg") //Cannot convert RGBA to JPEG
+
+# overlapping code using blend
+im1 = Image.open('tiger.jpg')
+im2 = Image.open('panda.jpg')
+im2 = im2.resize((353, 368))
+im = Image.blend(im1, im2, 0.7)
+im.show()
+
+# creating mask
+im1 = Image.open('tiger.jpg').convert("RGBA")
+im2 = Image.open('panda.jpg')
+im2 = im2.resize((353, 368)).convert("RGBA")
+r,g,b,a = im2.split()
+mask = r.point(lambda i: i < 50 and 255)
+im = Image.composite(im1, im2, mask)
+im.convert("RGB").save('./testresult/composite.jpg')
+
+#evaluating single pixel of the image
+im1 = Image.open('tiger.jpg')
+im = Image.eval(im1, lambda i: i * 0.7)
+im.show()
+
+#invert an image
+import numpy as np
+im = Image.open('tiger.jpg').split()[0]
+a = np.asarray(im)
+#im = Image.fromarray(a)
+b = np.invert(a)
+im = Image.fromarray(b)
+
+#cropping image
+import numpy as np
+im = Image.open('tiger.jpg')
+im.crop((100,100, 200,200)).show()
+
+#spread image pixel color
+import numpy as np
+im = Image.open('tiger.jpg')
+im.effect_spread(10).show()
+
+#blurring image
+im = Image.open('tiger.jpg')
+im.filter(filter=ImageFilter.BLUR)
+
+#image detailing and edge enhancing
+im = Image.open('panda.jpg')
+im.filter(filter=ImageFilter.DETAIL).filter(filter=ImageFilter.EDGE_ENHANCE_MORE)
+
+#getting coordinates of image
+im = Image.open('panda.jpg')
+im.getbbox()
+
+#getting channel
+im = Image.open('panda.jpg')
+im.getchannel("R").save("./testresult/getChannel.jpg")
+
+#pixel info - data we get by this method is in list format. if we want to manipulate the pixels use load() then manipulate it
+im = Image.open('panda.jpg')
+arr = list(im.getdata())
+for i in range(len(arr)):
+    r,g,b = arr[i]
+    if r<80 and g<80 and b<80:
+        arr[i] = (0,0,255)
+im.putdata(arr)
+im.save("./testresult/manipColorByGetdata().jpg")
+
+#Manipulate color 
+im = Image.open('panda.jpg')
+pixel = im.load()
+for x in range(1020):
+    for y in range(510):
+        r,g,b = pixel[x,y]
+        if r < 80 and g < 80 and b < 80:
+            pixel[x,y] = (255,0,0)
+im.save("./testresult/manipColor.jpg")
+
+#get extreame value for each band
+im = Image.open('panda.jpg')
+im.getextrema()
+
+#get pixel information but load is good for iterating
+im = Image.open('panda.jpg')
+im.getpixel((100,100))
+
+#update pixel info by putpixel()
+im = Image.open('panda.jpg')
+im.putpixel((100,100),(255,0,0))
+
+#histogram of color pixels in image - **can be useful to show how much vegetation cover is present in the image. Can pass mask to function for obtaining percentage of only sugarcane fields
+im = Image.open('panda.jpg').convert("L")
+im.histogram()
+
+#manipulating image with cropped image inverted in the original image
+box = (100, 100, 400, 400)
+region = im.crop(box)
+region = region.transpose(Image.ROTATE_180)
+im.paste(region, box)
+
+#pasting one image on other by coordinates
+im = Image.open('tiger.jpg').resize((400,400))
+im2 = Image.open('panda.jpg').resize((400,400))
+region = im.crop((100, 100, 200, 200))
+region = region.transpose(Image.ROTATE_180) //can skip if u dont want to transpose
+im2.paste(region, (100, 100, 200, 200))
+im2.show()
+
+============== ImageChops =================
+#blending images
+im = Image.open('panda.jpg').resize((300,300))
+im2 = Image.open('tiger.jpg').resize((300,300))
+ImageChops.blend(im, im2, 0.5).save("./testresult/blendByImageChops.jpg")
+
+#comparing and displaying darker pixel from both images
+im1 = Image.open('tiger.jpg').resize((300,300))
+im2 = Image.open('panda.jpg').resize((300,300))
+im = ImageChops.darker(im1, im2).show()
+im.save('./testresult/darker.jpg')
+
+#creates image with specified grey value with dimensions of specified image
+im1 = Image.open('panda.jpg')
+ImageChops.constant(im1, 200)
+
+#invert image
+im1 = Image.open('panda.jpg')
+ImageChops.constant(im1, 200)
+
+#multiply, and, or, xor, difference, darker, lighter, add, subtract. replace these inplace of multiply.
+im1 = Image.open('tiger.jpg').resize((300,300)).convert("1")
+im2 = Image.open('panda.jpg').resize((300,300)).convert("1")
+ImageChops.multiply(im1, im2).save('./testresult/multiply.jpg')
+
+#masking by Imagechops
+im1 = Image.open('tiger.jpg').resize((300,300))
+im2 = Image.open('panda.jpg').resize((300,300))
+r,g,b = im2.split()
+mask = r.point(lambda i: i < 50 and 255)
+ImageChops.composite(im1, im2, mask).show()
+
+================= ImageDraw ====================
+im1 = Image.open('panda.jpg')
+draw = ImageDraw.Draw(im1)
+draw.line([(0,0),(200,300),(300,100),(400,400)], fill=(0,0,0), width=20, joint = "curve")
+im1.save("./testresult/line.jpg")
+
+# Rectangle, Polygon, aligned text with fontcolor fontsize and opacity can be drawn with the help of this package.
+
+================= ImageEnhance ==================
+# brightness, contrast. change contrast to brightness
+im = Image.open("pandatry.jpg")
+enhancer = ImageEnhance.Contrast(im)
+factor = 1.5
+im_output = enhancer.enhance(factor)
+im_output.save("./testresult/contrast.jpg")
+
+#creates black&white image for factor = 0 and original for factor = 1
+im = Image.open("pandatry.jpg")
+enhancer = ImageEnhance.Color(im)
+factor = 0
+im_output = enhancer.enhance(factor)
+im_output.show()
+
+#sharpness
+im = Image.open("pandatry.jpg")
+enhancer = ImageEnhance.Sharpness(im)
+factor = 2
+im_output = enhancer.enhance(factor)
+im_output.save("./testresult/SharpnessImageEnhance.jpg")
+
+================ ImageFilter =====================
+Shapren, detail, sharpen, edge enhancer shown in above 1st section. 
+
+================ ImageMorph ======================
+from PIL import Image, ImageMorph
+from PIL.ImageMorph import LutBuilder, MorphOp
+
+img = Image.open("./testresult/try.png").convert("L")
+img.load()  # MorphOp.apply expects image are loaded.
+
+for op_name in ('corner', 'dilation4', 'dilation8', 'erosion4', 'erosion8', 'edge'):
+    lb = LutBuilder(op_name=op_name)
+    mop = MorphOp(lb.build_lut())
+    _, dimg = mop.apply(img)
+    dimg.save("./testresult/trial/"+op_name+".jpg")
+
+================ ImageStat ==========================
+#mean, count, sum, median
+im1 = Image.open('tiger.jpg').resize((300,300))
+ImageStat.Stat(im1).mean
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

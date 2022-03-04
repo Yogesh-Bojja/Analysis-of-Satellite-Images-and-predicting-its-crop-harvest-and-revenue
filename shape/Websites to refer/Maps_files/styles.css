@@ -1,0 +1,451 @@
+/*
+ *  This file is part of AtlasMapper server and clients.
+ *
+ *  Copyright (C) 2011 Australian Institute of Marine Science
+ *
+ *  Contact: Gael Lafond <g.lafond@aims.gov.au>
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+html, body, #loading { height: 100% }
+
+/* Hide the scroller that appear at loading time... */
+body {
+	overflow: hidden;
+}
+
+#list {
+	overflow: auto;
+}
+
+#loading {
+	background: #FFFFFF url('../images/loading.gif') no-repeat center center;
+	display: none; /* Activated by JS */
+}
+/* TODO Find a way to set this somewhere that is configurable by the user */
+.welcomeCls .x-window-mc {
+	background-color: #FFFFFF !important;
+	border: solid 1px #AABBCC !important;
+}
+.welcomeCls p {
+	margin: 1em 0;
+}
+
+/* Strong emphasis in this element is represented with red text. */
+.noJavaScript strong {
+	font-style: normal;
+	color: #CC0000;
+}
+.noJavaScript em {
+	font-style: italic;
+}
+
+/* Button on Embedded map */
+#goToMap {
+	position: relative;
+	float: left;
+	margin: 70px 0 0 8px;
+}
+.goToMapIcon {
+	background-image: url('../images/arrow_out.png') !important;
+}
+
+.highlighted {
+	background-color: #FDFFD7;
+}
+.highlighted a span {
+	font-style: italic;
+	color: #555555 !important;
+}
+.infoTab, .iframeTab {
+	padding: 0.2em;
+	font: 10pt tahoma,arial,helvetica,sans-serif;
+}
+.emptyInfo {
+	font-style: italic;
+}
+.layerNameLabel {
+	font-weight: bold;
+}
+
+.downloadLinksButton .x-btn-mc {
+	background-image: url('../images/btn-green.gif');
+}
+.downloadLinksButton button {
+	font-size: 2em;
+	height: 1.5em !important;
+}
+
+.downloadLinks {
+	font-size: 1.2em;
+	margin: 10px 5px 0 5px;
+}
+.downloadLinks .title {
+	font-weight: bold;
+}
+
+/* Selected layer entry, with loading background (NOTE: IE6 do not support chained classes) */
+.x-tree-selected.layerLoading {
+	background-image: url('../images/loading-bg-selected.gif');
+	background-position: center;
+}
+.layerLoading {
+	background-image: url('../images/loading-bg.gif');
+	background-position: center;
+}
+/* Will be used when OpenLayers will implement loadcancel event */
+.layerError {
+	background-color: #FFBBBB;
+}
+
+.legend {
+}
+.legend-group {
+	padding: 5px;
+	margin: 5px;
+}
+.legend-group-header {
+	font: bold 13px tahoma,arial,helvetica,sans-serif;
+	font-weight: bold;
+}
+.legend-item {
+	padding-left: 5px;
+}
+.legend-item-header {
+}
+
+.x-legend-delete {
+	float: right;
+	width: 16px;
+	height: 16px;
+	background-position: 16px 0; /* Move the image to the right, so there is nothing to display */
+	background-repeat: no-repeat;
+	background-image:url(../images/delete-sprites.gif);
+}
+
+/* Mouse over the legend item */
+:hover.legend-item .x-legend-delete {
+	background-position: 0; /* Show the first sprite, the light X */
+}
+
+/* Mouse over the legend X */
+:hover.legend-item .x-legend-delete:hover {
+	background-position: -16px; /* Show the second sprite, the dark X */
+}
+
+.ext-ie .x-tree-node-delete {
+	vertical-align: middle !important;
+}
+
+.ext-strict .ext-ie8 .x-tree-node-delete {
+	vertical-align: top !important;
+}
+.x-tree-noicon .x-tree-node-delete{
+	width:0; height:0;
+}
+.x-tree-node .x-tree-node-disabled .x-tree-node-delete {
+	-moz-opacity: 0.5;
+	opacity:.5;
+	filter: alpha(opacity=50);
+}
+
+.arcgisFeatureInfo {
+	font: normal 14px arial, tahoma, helvetica, sans-serif;
+}
+.arcgisFeatureInfo table {
+	margin-top: 1em;
+	border-collapse: collapse;
+}
+.arcgisFeatureInfo table tr.odd {
+	background-color: #EEEEEE;
+}
+.arcgisFeatureInfo table td {
+	padding: 0.2em 0.4em;
+}
+.arcgisFeatureInfo table td.key {
+	font-weight: bold;
+}
+.arcgisFeatureInfo table,
+.arcgisFeatureInfo table th,
+.arcgisFeatureInfo table td,
+.arcgisFeatureInfo table tr {
+	border: 1px solid black;
+}
+
+/* Open Layer */
+
+/* Position of the mouse: Black text above white background */
+div.olControlMousePosition {
+	background-color: #FFFFFF;
+	background-color: rgba(255, 255, 255, 0.75);
+	padding: 2px 5px;
+	right: 0 !important;
+}
+
+/* Some ExtJS theme change the color of the text in the OpenLayers popups. */
+div.olFramedCloudPopupContent {
+	color: #000000;
+}
+
+/* The ZoomPanel, when used without the pan panel, is to high... */
+#embeddedClient div.olControlZoomPanel {
+	top: 7px;
+}
+
+/* ExtJS remove the bullets to start from a known point
+	(some browser (IE) are really bad at following standards)
+	This class Reset bullet for chosen lists */
+.description ul,
+.downloadLinks ul,
+ul.bullet-list {
+	padding-left: 2em;
+	list-style-type: disc;
+}
+.description ol,
+.downloadLinks ol,
+ol.bullet-list {
+	padding-left: 2em;
+	list-style-type: decimal;
+}
+/* ExtJS remove the bullets on li instead of ul. It has to be reset in both. */
+.description ul > li,
+.downloadLinks ul > li,
+ul.bullet-list > li {
+	list-style-type: disc;
+	margin: 0.2em 0;
+}
+.description ol > li,
+.downloadLinks ol > li,
+ol.bullet-list > li {
+	list-style-type: decimal;
+	margin: 0.2em 0;
+}
+.downloadLinks p,
+.description p {
+	margin: 1em 0;
+}
+
+/* NOTE: "font-size: 0" remove the extra padding added for the text */
+.layers-btn {
+	font-size: 0;
+	float: left;
+	margin-left: 4px;
+}
+.layers-btn .add {
+	background-image: url('../images/add.png');
+}
+.layers-btn .remove {
+	background-image: url('../images/remove.png');
+}
+.layers-btn .hide {
+	background-image: url('../images/hide.png');
+}
+
+.layerGroup span {
+	font-style: italic;
+}
+
+.systemDescription,
+.descriptionLayerId {
+	color: #AAAAAA;
+	font-size: 0.8em;
+	margin-top: 1em;
+}
+
+
+/* Map Tools */
+
+.printFrameButton {
+	background-image: url('../images/frame-24px.png');
+}
+.linkButton {
+	background-image: url('../images/link-24px.png');
+}
+.searchButton {
+	background-image: url('../images/search-24px.png');
+}
+.configButton {
+	background-image: url('../images/config-24px.png');
+}
+.measurementLineButton {
+	background-image: url('../images/ruler-button-24px.png');
+}
+.measurementAreaButton {
+	background-image: url('../images/ruler-area-button-24px.png');
+}
+.measurementText {
+	margin-top: 4px;
+}
+
+.searchResultsDescription .query {
+	font-size: 1.1em;
+	margin-bottom: 1em;
+/*	margin-left: 2em;
+	text-indent: -2em;*/
+	font-weight: bold;
+}
+.searchResultsDescription .query .label {
+	display: none;
+}
+
+.searchResultsDescription .pager {
+	margin-bottom: 1em;
+	float: right;
+}
+
+.searchResultsDescription .pager span {
+	margin: 1.2em 1em;
+	display: block;
+	float: left;
+}
+.searchResultsDescription .pager a {
+	margin: 0 0.1em;
+	cursor: pointer;
+	display: block;
+	width: 48px;
+	height: 48px;
+}
+.searchResultsDescription .pager a span {
+	display: none;
+}
+.searchResultsDescription .pager a.prevPage {
+	background-image: url('../images/previousbutton.png');
+	float: left;
+}
+.searchResultsDescription .pager a.prevPage:hover {
+	background-image: url('../images/previousbutton_over.png');
+}
+.searchResultsDescription .pager a.nextPage {
+	background-image: url('../images/nextbutton.png');
+	float: left;
+}
+.searchResultsDescription .pager a.nextPage:hover {
+	background-image: url('../images/nextbutton_over.png');
+}
+
+.searchResultsDescription div.results span {
+	display: none;
+}
+
+.searchResultsDescription div.results ol li.highlight {
+	background-color: #DDDDDD;
+}
+
+.searchResultsDescription div.results ol {
+	list-style-type: none;
+}
+.searchResultsDescription div.results ol li {
+	list-style-type: none;
+	padding: 0 0 1em 2em;
+	background-size: 1.5em;
+	background-repeat: no-repeat;
+	min-height: 2em;
+}
+
+/* Layer Search results */
+.search-item {
+	border: 1px solid #DDDDDD;
+	margin: 0.2em;
+	font-size: 1.2em;
+	line-height: 1.4em;
+	overflow: hidden;
+	cursor: pointer;
+}
+.search-item .keyword {
+	font-weight: bold;
+}
+.result-title {
+	background-color: #DDDDDD;
+}
+.result-title,
+.result-excerpt {
+	padding: 0.2em;
+}
+.result-empty {
+	font-style: italic;
+}
+.search-item-highlighted .result-title {
+	background-color: #ADD0FB;
+}
+.search-item-highlighted .result-excerpt {
+	background-color: #D9E8FB;
+}
+
+
+/* Feature requests - Popup with tabs */
+div.popup {
+	/* inline-block: Used to stretch the width of the element to include everything, even if there is a horizontal scroller. Block with width 100% only apply to visible zone. */
+	display: inline-block;
+}
+/* IE 9 & 8 - Not able to handle inline-block properly (used 200% of expected width) */
+.ext-ie8 div.popup,
+.ext-ie9 div.popup {
+	display: block;
+}
+
+div.popup select.popup-tab {
+	max-width: 200px;
+}
+
+div.popup select.popup-tab option.hidden,
+div.popup select.popup-tab option.closed {
+	/* IE 7 Bug: Display none is ignored without the "important" keyword */
+	display: none !important;
+}
+
+div.popup div.popup-content {
+	display: none;
+}
+
+div.popup div.popup-content-active {
+	display: block;
+}
+
+/* IE can not get the style from the document */
+table.featureInfo, table.featureInfo td, table.featureInfo th {
+	border:1px solid #ddd;
+	border-collapse:collapse;
+	margin:0;
+	font-size: 90%;
+	padding: 0.2em 0.1em;
+}
+table.featureInfo th {
+	padding: 0.2em 0.2em;
+	font-weight:bold;
+	background:#eee;
+}
+table.featureInfo td{
+	background:#fff;
+}
+table.featureInfo tr.odd td{
+	background:#eee;
+}
+table.featureInfo caption{
+	text-align:left;
+	font-size:100%;
+	font-weight:bold;
+	padding:.2em .2em;
+}
+
+ul.downloadLoggerLinksList {
+	height: 100px;
+	overflow: auto;
+	margin-bottom: 5px;
+}
+iframe.downloadLogger {
+	width: 100%;
+	height: 200px;
+	border: none;
+}

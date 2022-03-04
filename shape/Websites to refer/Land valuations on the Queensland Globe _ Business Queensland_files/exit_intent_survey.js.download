@@ -1,0 +1,305 @@
+jQuery(document).ready(function(){
+	// Scope variables
+	var cookieName = "survey";
+	var minSessionSeconds = 90;
+	var minPagesVisited = 3;
+	var expiryDaysCompleted = 90;
+	var expiryDaysNo = 30;
+	   
+	// Temp script.
+	$("#busq-carousel #224937").hide();
+
+	function initExitIntentSurvey() {
+	    // Settings
+	    $.cookie.json = true;
+	    
+	    // UI handlers
+	    $(".exit-survey__panel").on("click", toggleSurvey);
+	    $("#exit-survey-question-no").on("click", noToSurvey);
+	    $("#exit-survey-question-yes").on("click", yesToSurvey);
+	    $("#exit-survey-leave-no").on("click", deferSurvey);
+	    $("#exit-survey-later").on("click", deferSurvey);
+
+		var screenview_width = $(window).innerWidth();
+
+		if(screenview_width < 700) {
+			$(".exit-survey").addClass("active").addClass('in');
+		}
+	    
+	    // View init
+	    if ( !getCookie() || getCookie().showSurvey ) {
+	        $(document).on("mouseleave", ifLeaving);
+	        determineAction();
+	    }
+	}
+
+	function determineAction(newPage, leaving) {
+	    var cookie = getCookie();
+	    newPage = typeof newPage !== 'undefined' ? newPage : true;
+	    leaving = typeof leaving !== 'undefined' ? leaving : false;
+
+	    // Cookie
+	    if (cookie === null) {
+	        cookie = { pageNumber: 1, timeOnSite: moment().unix(), showSurvey: true, accepted: false };
+	        setCookie(cookie);
+
+	        ga('send', 'event', 'Exit Survey', 'Invitation_load');
+	        
+	        return false;
+	    } else if (newPage) {
+	        cookie.pageNumber = cookie.pageNumber + 1;
+	        setCookie(cookie);    
+	    }
+
+	    // Display logic
+	    if(eligibleForSurvey()) {
+	        $(".exit-survey").show();
+	        	ga('send', 'event', 'Exit Survey', 'Invitation_load');
+	        if(!cookie.accepted) {
+	            slideSurveyBoxOut(leaving);
+	        }
+	    }
+	}
+
+	function eligibleForSurvey() {
+	    var cookie = getCookie();
+	    if(cookie.showSurvey) {
+	        if( secondsOnSite() > minSessionSeconds && cookie.pageNumber >= minPagesVisited) {
+	            return true;
+	        }       
+	    }
+	    return false;
+	}
+
+	$(window).resize(function(){
+	    eligibleForSurvey();
+	});
+
+	function toggleSurvey(){
+	    if ($(".exit-survey").hasClass('active')){
+	        slideSurveyBoxIn();
+	    }else{
+	        slideSurveyBoxOut();
+	    }
+	    
+	    return false;
+	}
+
+	function ifLeaving(e) {
+	    var cookie = getCookie();
+	    if(e.clientY < 0) {
+	        if($('#feedbackForm').hasClass('in')){
+	            
+	        }else{
+	            if(cookie.showSurvey && cookie.accepted) {
+	                slideSurveyBoxOut(true);
+	            }
+	        }
+	    }
+	}
+
+	function noToSurvey(ev) {
+	    setSurveySaysCookie(false);
+	    slideSurveyBoxIn();
+	    hideSurveyBox();
+
+	    ga('send', 'event', 'Exit Survey', 'Invitation_No');
+
+	    return false;
+	}
+
+	function yesToSurvey(ev) {
+	    var cookie = getCookie();
+	    var screenview_width = $(window).innerWidth();
+	    cookie.accepted = true;
+	    setCookie(cookie);
+
+	    $(".exit-survey .content-panel").hide();
+	    $("#exit-survey-start-panel").show();
+
+	    if(screenview_width < 700) {
+	    	$("#exit-survey-start").on("click", hideSurveyBox);
+	    }
+
+	    ga('send', 'event', 'Exit Survey', 'Invitation_Yes');
+	    return false;
+	}
+
+
+	// Mobile view only.
+	function slideDown() {
+		var screenview_width = $(window).innerWidth();
+
+		if(screenview_width < 700) {
+			$(".exit-survey").addClass("slide-down").removeClass("slide-up");
+			$(this).closest("#exit-survey-start-panel").hide();
+		}
+	}
+
+	function slideUp() {
+		var screenview_width = $(window).innerWidth();
+
+		if(screenview_width < 700) {
+			$(".exit-survey").addClass("slide-up active in").removeClass("slide-down");
+		}
+	}
+
+	function touchSlideDown() {
+		var screenview_width = $(window).innerWidth();
+
+		if(screenview_width < 700) {
+			$(".exit-survey").addClass("slide-down").removeClass("slide-up");
+			console.log("remove");
+		}
+	}
+
+	function deferSurvey(ev) {
+	    ga('send', 'event', 'Exit Survey', 'Survey_Defer');
+
+	    slideSurveyBoxIn();
+	    return false;
+	}
+
+	function showSurvey(ev) {
+	    ga('send', 'event', 'Exit Survey', 'Survey_Start');
+	    return false;
+	}
+
+	function setSurveyTaken(ev) {
+	    setSurveySaysCookie(true);
+	    hideSurveyBox();
+
+	    return false;
+	}
+
+	function setSurveySaysCookie(completed) {
+	    var cookie = getCookie();
+	    completed = typeof completed !== 'undefined' ? completed : true;
+
+	    cookie.showSurvey = false;
+	    setCookie(cookie, completed);
+	}
+
+	function slideSurveyBoxOut(leaving) {
+	    leaving = typeof leaving !== 'undefined' ? leaving : false;
+
+	    var cookie = getCookie();
+	    
+	    $(".exit-survey").addClass("active").addClass('in');
+	    
+	    if(cookie.accepted && leaving === true) {
+	        $(".exit-survey .content-panel").hide();
+	        $("#exit-survey-leave").show();    
+	    }
+	    else if(cookie.accepted) {
+	        $(".exit-survey .content-panel").hide();
+	        $("#exit-survey-start-panel").show();
+	    }
+	}
+
+	function slideSurveyBoxIn(ev) {
+	    $('.exit-survey').removeClass('in').removeClass("active");
+
+	    return false;
+	}
+
+	function hideSurveyBox() {
+	    $(".exit-survey").hide();
+	}
+
+	function secondsOnSite() {
+	    var cookieTime = moment.unix(getCookie().timeOnSite);
+	    var currentDate = moment();
+
+	    return currentDate.diff(cookieTime, 'seconds');
+	}
+
+	function getCookie() {
+	    var cookie = $.cookie(cookieName) || null;
+	    return cookie;
+	}
+
+	function setCookie(cookie, completed) {
+	    completed = typeof completed !== 'undefined' ? completed : true;
+
+	    if ( completed ) {
+	        $.cookie(cookieName, cookie, { expires: expiryDaysCompleted, path: '/' });
+	    } else {
+	        $.cookie(cookieName, cookie, { expires: expiryDaysNo, path: '/' });
+	    }
+	}
+
+	initExitIntentSurvey();
+
+	function feedbackCloseModal(){
+	     setTimeout(function(){ 
+	         if($('#feedbackForm').hasClass('in')){
+	            $('#feedbackForm').modal('toggle'); 
+	         }
+	     }, 12000);   
+	}
+
+	function formReady(){
+	    slideSurveyBoxIn();
+	    $("#form_email_35778").validate({
+	        ignore:":hidden",
+	        errorPlacement: function(error, element) {
+	    		$( element ).closest('.sq-form-question').find('.error').append(error);
+	    	},
+	    	rules: {
+	            field: {
+	              required: true,
+	            }
+	        },
+	        submitHandler: function(form) {
+	            
+	            var form = $('#form_email_35778');
+	            var formData = form.serialize();
+	            var formSubmit = form.find('input[type="submit"]');
+	            // process the form
+	            $.ajax({
+	                type: 'POST',
+	                url: form.attr('action'),
+	                data: formData,
+	                success: function (response) {
+	                    
+	                    $('.modal-body').html(response);
+	                    hideSurveyBox();
+	                    setSurveySaysCookie(true);
+	                    ga('send', 'event', 'Exit Survey', 'Submit');
+	                    if($('.sq-form-errors-message').length === 0){
+	                        feedbackCloseModal();
+	                    }
+	    
+	                }
+	            });
+	                
+	        }
+	    });
+	}
+
+	$("#feedbackForm").on("shown.bs.modal", function (e) {
+	  setTimeout(function(){ formReady(); }, 1000);
+	});
+
+	// Slide down exit survey on mobile view.
+	$("#exit-survey-later").on("click", slideDown);
+
+	// Toggle exit survey on mobile view.
+	$(".exit-survey__panel").on("click", function() {
+		if($(this).attr('data-click-state') == 1) {
+			$(this).attr('data-click-state', 0);
+			slideUp();
+		} else {
+			$(this).attr('data-click-state', 1)
+			slideDown();
+		}
+	});
+
+	// Slide down exit survey on mobile view when users touch move.
+    $("body").on("touchmove", touchSlideDown);
+
+    // Hide exit intent section when users click start survey button.
+	$("#exit-survey-start").on("click", hideSurveyBox);
+	
+}(jQuery));
